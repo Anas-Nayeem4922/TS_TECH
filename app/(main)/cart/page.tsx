@@ -49,10 +49,10 @@ export default function CartPage() {
         <div className='min-h-screen pt-20 pb-16'>
             <div className='max-w-6xl mx-auto px-4 sm:px-6 py-10'>
                 <div className='flex items-center justify-between mb-2'>
-                    <h1 className='text-3xl font-bold text-white'>
+                    <h1 className='text-2xl sm:text-3xl font-bold text-white'>
                         Shopping Cart
                         {count > 0 && (
-                            <span className='ml-3 text-lg text-silver-500 font-normal'>
+                            <span className='ml-2 sm:ml-3 text-sm sm:text-lg text-silver-500 font-normal'>
                                 ({count} items)
                             </span>
                         )}
@@ -79,7 +79,7 @@ export default function CartPage() {
                             size={64}
                             className='text-dark-50 mx-auto mb-4'
                         />
-                        <h2 className='text-xl font-semibold text-white mb-2'>
+                        <h2 className='text-lg sm:text-xl font-semibold text-white mb-2'>
                             Your cart is empty
                         </h2>
                         <p className='text-silver-500 mb-6'>
@@ -231,7 +231,7 @@ export default function CartPage() {
                         {/* Order Summary */}
                         <div>
                             <div className='sticky top-24 card-surface rounded-2xl border border-white/5 p-6'>
-                                <h2 className='text-lg font-bold text-white mb-5'>
+                                <h2 className='text-base sm:text-lg font-bold text-white mb-5'>
                                     Order Summary
                                 </h2>
 
