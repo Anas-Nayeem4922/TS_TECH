@@ -358,7 +358,7 @@ export default function HomePage() {
                         {[
                             {
                                 icon: PiggyBank,
-                                title: "Market-Beating Pricing",
+                                title: "Genuine Pricing",
                                 desc: "Premium products without the premium markup. Our optimized sourcing enables savings of up to 20% compared to the industry standard, delivering exceptional value on every purchase.",
                             },
                             {
