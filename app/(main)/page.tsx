@@ -419,7 +419,7 @@ export default function HomePage() {
                             {
                                 name: "Priya Banerjee",
                                 location: "Park Street, Kolkata",
-                                review: "The GaN charger charges my laptop and phone together. Amazing product at a great price. Will definitely buy again.",
+                                review: "Excellent smartwatch at an affordable price. Fast, convenient, and ideal for anyone .",
                                 rating: 5,
                             },
                             {

@@ -11,8 +11,10 @@ import {
     ArrowRight,
     Package,
     Tag,
+    Smartphone,
+    Palette,
 } from "lucide-react";
-import { useCart } from "@/context/CartContext";
+import { useCart, cartItemKey } from "@/context/CartContext";
 import { toast } from "sonner";
 
 export default function CartPage() {
@@ -96,135 +98,180 @@ export default function CartPage() {
                         {/* Cart Items */}
                         <div className='lg:col-span-2 space-y-3'>
                             <AnimatePresence mode='popLayout'>
-                                {items.map(({ product, quantity }) => (
-                                    <motion.div
-                                        key={product.id}
-                                        layout
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{
-                                            opacity: 0,
-                                            x: -20,
-                                            height: 0,
-                                            marginBottom: 0,
-                                        }}
-                                        transition={{ duration: 0.25 }}
-                                        className='flex gap-4 p-4 card-surface rounded-2xl border border-white/5'
-                                    >
-                                        {/* Image */}
-                                        <Link
-                                            href={`/products/${product.slug}`}
-                                            className='flex-shrink-0'
+                                {items.map(
+                                    ({
+                                        product,
+                                        quantity,
+                                        caseBrand,
+                                        caseModel,
+                                        selectedColor,
+                                    }) => (
+                                        <motion.div
+                                            key={cartItemKey(
+                                                product.id,
+                                                caseBrand,
+                                                caseModel,
+                                                selectedColor,
+                                            )}
+                                            layout
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{
+                                                opacity: 0,
+                                                x: -20,
+                                                height: 0,
+                                                marginBottom: 0,
+                                            }}
+                                            transition={{ duration: 0.25 }}
+                                            className='flex gap-4 p-4 card-surface rounded-2xl border border-white/5'
                                         >
-                                            <div className='w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-dark-300'>
-                                                {(
-                                                    (
-                                                        product.images as string[]
-                                                    )?.[0]
-                                                ) ?
-                                                    <img
-                                                        src={
-                                                            (
-                                                                product.images as string[]
-                                                            )[0]
-                                                        }
-                                                        alt={product.name}
-                                                        className='w-full h-full object-cover'
-                                                    />
-                                                :   <div className='w-full h-full flex items-center justify-center'>
-                                                        <Package
-                                                            size={24}
-                                                            className='text-dark-50'
+                                            {/* Image */}
+                                            <Link
+                                                href={`/products/${product.slug}`}
+                                                className='flex-shrink-0'
+                                            >
+                                                <div className='w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden bg-dark-300'>
+                                                    {(
+                                                        (
+                                                            product.images as string[]
+                                                        )?.[0]
+                                                    ) ?
+                                                        <img
+                                                            src={
+                                                                (
+                                                                    product.images as string[]
+                                                                )[0]
+                                                            }
+                                                            alt={product.name}
+                                                            className='w-full h-full object-cover'
                                                         />
-                                                    </div>
-                                                }
-                                            </div>
-                                        </Link>
-
-                                        {/* Details */}
-                                        <div className='flex-1 min-w-0'>
-                                            <div className='flex items-start justify-between gap-2'>
-                                                <div>
-                                                    {product.brand && (
-                                                        <div className='text-[10px] text-gold-500 font-semibold uppercase tracking-wider mb-0.5'>
-                                                            {product.brand}
+                                                    :   <div className='w-full h-full flex items-center justify-center'>
+                                                            <Package
+                                                                size={24}
+                                                                className='text-dark-50'
+                                                            />
                                                         </div>
-                                                    )}
-                                                    <Link
-                                                        href={`/products/${product.slug}`}
-                                                        className='text-sm font-semibold text-white hover:text-gold-400 transition-colors line-clamp-2'
-                                                    >
-                                                        {product.name}
-                                                    </Link>
-                                                </div>
-                                                <button
-                                                    onClick={() =>
-                                                        removeFromCart(
-                                                            product.id,
-                                                        )
                                                     }
-                                                    className='p-1.5 text-silver-600 hover:text-red-400 transition-colors flex-shrink-0'
-                                                    aria-label='Remove'
-                                                >
-                                                    <Trash2 size={15} />
-                                                </button>
-                                            </div>
-
-                                            <div className='flex items-center justify-between mt-3'>
-                                                {/* Quantity */}
-                                                <div className='flex items-center gap-1.5 bg-dark-400 border border-white/10 rounded-lg p-1'>
-                                                    <button
-                                                        onClick={() =>
-                                                            updateQuantity(
-                                                                product.id,
-                                                                quantity - 1,
-                                                            )
-                                                        }
-                                                        className='w-6 h-6 flex items-center justify-center text-silver-400 hover:text-white transition-colors'
-                                                    >
-                                                        <Minus size={12} />
-                                                    </button>
-                                                    <span className='w-7 text-center text-sm font-semibold text-white'>
-                                                        {quantity}
-                                                    </span>
-                                                    <button
-                                                        onClick={() =>
-                                                            updateQuantity(
-                                                                product.id,
-                                                                quantity + 1,
-                                                            )
-                                                        }
-                                                        className='w-6 h-6 flex items-center justify-center text-silver-400 hover:text-white transition-colors'
-                                                    >
-                                                        <Plus size={12} />
-                                                    </button>
                                                 </div>
+                                            </Link>
 
-                                                {/* Price */}
-                                                <div className='text-right'>
-                                                    <div className='text-sm font-bold text-gold-400'>
-                                                        ₹
-                                                        {(
-                                                            product.price *
-                                                            quantity
-                                                        ).toLocaleString(
-                                                            "en-IN",
+                                            {/* Details */}
+                                            <div className='flex-1 min-w-0'>
+                                                <div className='flex items-start justify-between gap-2'>
+                                                    <div>
+                                                        {product.brand && (
+                                                            <div className='text-[10px] text-gold-500 font-semibold uppercase tracking-wider mb-0.5'>
+                                                                {product.brand}
+                                                            </div>
+                                                        )}
+                                                        <Link
+                                                            href={`/products/${product.slug}`}
+                                                            className='text-sm font-semibold text-white hover:text-gold-400 transition-colors line-clamp-2'
+                                                        >
+                                                            {product.name}
+                                                        </Link>
+                                                        {caseBrand &&
+                                                            caseModel && (
+                                                                <div className='mt-1 inline-flex items-center gap-1.5 text-[11px] text-gold-400 bg-gold-500/8 border border-gold-500/15 rounded-md px-2 py-0.5'>
+                                                                    <Smartphone
+                                                                        size={
+                                                                            10
+                                                                        }
+                                                                    />
+                                                                    {caseBrand}{" "}
+                                                                    ·{" "}
+                                                                    {caseModel}
+                                                                </div>
+                                                            )}
+                                                        {selectedColor && (
+                                                            <div className='mt-1 inline-flex items-center gap-1.5 text-[11px] text-silver-300 bg-white/5 border border-white/10 rounded-md px-2 py-0.5'>
+                                                                <Palette
+                                                                    size={10}
+                                                                />
+                                                                {selectedColor}
+                                                            </div>
                                                         )}
                                                     </div>
-                                                    {quantity > 1 && (
-                                                        <div className='text-[10px] text-silver-600'>
+                                                    <button
+                                                        onClick={() =>
+                                                            removeFromCart(
+                                                                product.id,
+                                                                caseBrand,
+                                                                caseModel,
+                                                                selectedColor,
+                                                            )
+                                                        }
+                                                        className='p-1.5 text-silver-600 hover:text-red-400 transition-colors flex-shrink-0'
+                                                        aria-label='Remove'
+                                                    >
+                                                        <Trash2 size={15} />
+                                                    </button>
+                                                </div>
+
+                                                <div className='flex items-center justify-between mt-3'>
+                                                    {/* Quantity */}
+                                                    <div className='flex items-center gap-1.5 bg-dark-400 border border-white/10 rounded-lg p-1'>
+                                                        <button
+                                                            onClick={() =>
+                                                                updateQuantity(
+                                                                    product.id,
+                                                                    quantity -
+                                                                        1,
+                                                                    caseBrand,
+                                                                    caseModel,
+                                                                    selectedColor,
+                                                                )
+                                                            }
+                                                            className='w-6 h-6 flex items-center justify-center text-silver-400 hover:text-white transition-colors'
+                                                        >
+                                                            <Minus size={12} />
+                                                        </button>
+                                                        <span className='w-7 text-center text-sm font-semibold text-white'>
+                                                            {quantity}
+                                                        </span>
+                                                        <button
+                                                            onClick={() =>
+                                                                updateQuantity(
+                                                                    product.id,
+                                                                    quantity +
+                                                                        1,
+                                                                    caseBrand,
+                                                                    caseModel,
+                                                                    selectedColor,
+                                                                )
+                                                            }
+                                                            className='w-6 h-6 flex items-center justify-center text-silver-400 hover:text-white transition-colors'
+                                                        >
+                                                            <Plus size={12} />
+                                                        </button>
+                                                    </div>
+
+                                                    {/* Price */}
+                                                    <div className='text-right'>
+                                                        <div className='text-sm font-bold text-gold-400'>
                                                             ₹
-                                                            {product.price.toLocaleString(
+                                                            {(
+                                                                product.price *
+                                                                quantity
+                                                            ).toLocaleString(
                                                                 "en-IN",
-                                                            )}{" "}
-                                                            each
+                                                            )}
                                                         </div>
-                                                    )}
+                                                        {quantity > 1 && (
+                                                            <div className='text-[10px] text-silver-600'>
+                                                                ₹
+                                                                {product.price.toLocaleString(
+                                                                    "en-IN",
+                                                                )}{" "}
+                                                                each
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </motion.div>
-                                ))}
+                                        </motion.div>
+                                    ),
+                                )}
                             </AnimatePresence>
                         </div>
 
