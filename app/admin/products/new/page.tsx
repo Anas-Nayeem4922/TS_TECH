@@ -377,7 +377,8 @@ export default function NewProductPage() {
                             <select
                                 value={form.categoryId}
                                 onChange={set("categoryId")}
-                                className='w-full input-dark px-4 py-3 rounded-xl text-sm'
+                                style={{ colorScheme: "dark" }}
+                                className='w-full input-dark px-4 py-3 rounded-xl text-sm appearance-none cursor-pointer'
                             >
                                 <option value=''>No category</option>
                                 {categories.map((c) => (

@@ -34,6 +34,7 @@ export async function GET() {
                     orderNumber: true,
                     total: true,
                     status: true,
+                    paymentMethod: true,
                     createdAt: true,
                 },
             }),

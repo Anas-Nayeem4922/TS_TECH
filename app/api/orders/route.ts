@@ -22,7 +22,6 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ order });
         }
 
-        // app/api/orders/route.ts
         const orders = await prisma.order.findMany({
             where: { userId: user.id },
             orderBy: { createdAt: "desc" },
@@ -34,13 +33,7 @@ export async function GET(req: NextRequest) {
                 },
             },
         });
-
-        const formatted = orders.map((o) => ({
-            ...o,
-            order_items: o.orderItems, // add snake_case alias for frontend
-        }));
-
-        return NextResponse.json({ orders: formatted });
+        return NextResponse.json({ orders });
     } catch (err) {
         return NextResponse.json(
             {
@@ -89,7 +82,8 @@ export async function POST(req: NextRequest) {
             data: {
                 orderNumber,
                 userId: user.id,
-                status: "confirmed",
+                status:
+                    paymentMethod === "upi" ? "payment_pending" : "processing",
                 subtotal,
                 shippingFee,
                 total,
@@ -128,6 +122,45 @@ export async function POST(req: NextRequest) {
         await refreshLoyalty(user.id);
 
         return NextResponse.json({ order });
+    } catch (err) {
+        return NextResponse.json(
+            {
+                error:
+                    err instanceof Error ?
+                        err.message
+                    :   "Internal server error",
+            },
+            { status: 500 },
+        );
+    }
+}
+
+export async function PATCH(req: NextRequest) {
+    try {
+        const user = await getCurrentUser();
+        if (!user?.isAdmin)
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 403 },
+            );
+
+        const { orderNumber, status } = await req.json();
+        const order = await prisma.order.findFirst({
+            where: { orderNumber },
+            select: { id: true },
+        });
+        if (!order)
+            return NextResponse.json(
+                { error: "Order not found" },
+                { status: 404 },
+            );
+
+        const updated = await prisma.order.update({
+            where: { id: order.id },
+            data: { status },
+        });
+
+        return NextResponse.json({ order: updated });
     } catch (err) {
         return NextResponse.json(
             {

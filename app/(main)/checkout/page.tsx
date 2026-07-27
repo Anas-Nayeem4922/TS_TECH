@@ -19,12 +19,14 @@ import {
     Trash2,
     Palette,
     Smartphone,
+    X,
 } from "lucide-react";
 import { useCart, cartItemKey } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { toast } from "sonner";
 import type { Address } from "@/lib/database.types";
+import { QRCodeCanvas } from "qrcode.react";
 
 type Step = "address" | "payment" | "review";
 
@@ -50,14 +52,47 @@ const PAYMENT_METHODS = [
         id: "upi",
         label: "UPI Payment",
         desc: "Pay via UPI (GPay, PhonePe, Paytm)",
-        icon: CreditCard,
+        icon: Smartphone,
     },
-    {
-        id: "card",
-        label: "Credit/Debit Card",
-        desc: "Secure card payment",
-        icon: CreditCard,
-    },
+];
+
+const INDIA_STATES = [
+    "Andhra Pradesh",
+    "Arunachal Pradesh",
+    "Assam",
+    "Bihar",
+    "Chhattisgarh",
+    "Goa",
+    "Gujarat",
+    "Haryana",
+    "Himachal Pradesh",
+    "Jharkhand",
+    "Karnataka",
+    "Kerala",
+    "Madhya Pradesh",
+    "Maharashtra",
+    "Manipur",
+    "Meghalaya",
+    "Mizoram",
+    "Nagaland",
+    "Odisha",
+    "Punjab",
+    "Rajasthan",
+    "Sikkim",
+    "Tamil Nadu",
+    "Telangana",
+    "Tripura",
+    "Uttar Pradesh",
+    "Uttarakhand",
+    "West Bengal",
+    "Andaman and Nicobar Islands",
+    "Chandigarh",
+    "Dadra and Nagar Haveli and Daman and Diu",
+    "Delhi",
+    "Jammu and Kashmir",
+    "Ladakh",
+    "Lakshadweep",
+    "Puducherry",
 ];
 
 const STEPS = ["address", "payment", "review"];
@@ -95,6 +130,8 @@ export default function CheckoutPage() {
         null,
     );
     const [paymentMethod, setPaymentMethod] = useState("cod");
+    const [showQrModal, setShowQrModal] = useState(false);
+    const [upiPaid, setUpiPaid] = useState(false);
     const [address, setAddress] = useState<AddressForm>({
         fullName: "",
         phone: "",
@@ -492,8 +529,7 @@ export default function CheckoutPage() {
                                         >
                                             State *
                                         </label>
-                                        <input
-                                            type='text'
+                                        <select
                                             value={address.state}
                                             onChange={(e) =>
                                                 setAddress((p) => ({
@@ -501,9 +537,21 @@ export default function CheckoutPage() {
                                                     state: e.target.value,
                                                 }))
                                             }
-                                            className='w-full input-dark px-4 py-2.5 rounded-xl text-sm'
-                                            placeholder='West Bengal'
-                                        />
+                                            style={{
+                                                colorScheme:
+                                                    isDark ? "dark" : "light",
+                                            }}
+                                            className='w-full input-dark px-4 py-2.5 rounded-xl text-sm appearance-none cursor-pointer'
+                                        >
+                                            <option value=''>
+                                                Select state
+                                            </option>
+                                            {INDIA_STATES.map((s) => (
+                                                <option key={s} value={s}>
+                                                    {s}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                     <div>
                                         <label
@@ -797,15 +845,24 @@ export default function CheckoutPage() {
                                     >
                                         Back
                                     </button>
-                                    <button
-                                        onClick={handlePlaceOrder}
-                                        disabled={placing}
-                                        className='flex-1 btn-gold py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-60'
-                                    >
-                                        {placing ?
-                                            "Placing Order..."
-                                        :   "Place Order"}
-                                    </button>
+                                    {paymentMethod === "upi" && !upiPaid ?
+                                        <button
+                                            onClick={() => setShowQrModal(true)}
+                                            className='flex-1 btn-gold py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2'
+                                        >
+                                            <Smartphone size={14} /> Pay with
+                                            UPI <ChevronRight size={14} />
+                                        </button>
+                                    :   <button
+                                            onClick={handlePlaceOrder}
+                                            disabled={placing}
+                                            className='flex-1 btn-gold py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-60'
+                                        >
+                                            {placing ?
+                                                "Placing Order..."
+                                            :   "Place Order"}
+                                        </button>
+                                    }
                                 </div>
                             </motion.div>
                         )}
@@ -1143,6 +1200,81 @@ export default function CheckoutPage() {
                     </div>
                 </div>
             </div>
+
+            {/* UPI QR Payment Modal — shown at review step with locked amount */}
+            {showQrModal && (
+                <div
+                    className='fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4'
+                    onClick={() => !placing && setShowQrModal(false)}
+                >
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className={`card-surface rounded-2xl border ${cardBorder} p-6 max-w-md w-full`}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className='flex items-center justify-between mb-5'>
+                            <div>
+                                <h3 className={`text-lg font-bold ${tc}`}>
+                                    UPI Payment
+                                </h3>
+                                <p className={`text-xs ${mc}`}>
+                                    Scan to pay with any UPI app
+                                </p>
+                            </div>
+                            <button
+                                onClick={() =>
+                                    !placing && setShowQrModal(false)
+                                }
+                                className={`${mc} hover:opacity-70 transition-opacity`}
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+
+                        {/* Big QR — white background for scannability, minimal padding */}
+                        <div className='flex justify-center mb-5'>
+                            <div className='bg-white rounded-xl p-3'>
+                                <QRCodeCanvas
+                                    value={`upi://pay?pa=9681076990@axl&pn=IMRAN%20ALI%20WARSI&am=${grandTotal}&cu=INR`}
+                                    size={300}
+                                    level='M'
+                                    marginSize={0}
+                                />
+                            </div>
+                        </div>
+
+                        <div
+                            className={`rounded-xl ${innerBg} p-4 mb-4 text-center`}
+                        >
+                            <div className={`text-xs ${mc} mb-1`}>
+                                Amount Payable (locked)
+                            </div>
+                            <div className='text-3xl font-bold text-gold-400'>
+                                ₹{grandTotal.toLocaleString("en-IN")}
+                            </div>
+                            <div className={`text-[10px] ${mc} mt-1`}>
+                                This amount is pre-filled in your UPI app and
+                                cannot be changed
+                            </div>
+                        </div>
+
+                        <p className={`text-xs ${mc} mb-4 text-center`}>
+                            Open GPay, PhonePe, or Paytm and scan the QR above.
+                            The exact amount will appear automatically.
+                        </p>
+                        <button
+                            onClick={() => {
+                                setUpiPaid(true);
+                                setShowQrModal(false);
+                            }}
+                            className='w-full btn-gold py-3 rounded-xl font-semibold text-sm'
+                        >
+                            I've Paid — Continue
+                        </button>
+                    </motion.div>
+                </div>
+            )}
         </div>
     );
 }
