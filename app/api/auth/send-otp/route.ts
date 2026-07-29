@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { generateOtpCode, hashOtp, sendOtpEmail } from "@/lib/email";
+import { verifyPassword } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
     try {
@@ -38,6 +39,17 @@ export async function POST(req: NextRequest) {
                         error: "No account found with this email. Please sign up first.",
                     },
                     { status: 404 },
+                );
+            }
+
+            const passwordValid = await verifyPassword(
+                password,
+                existing.passwordHash,
+            );
+            if (!passwordValid) {
+                return NextResponse.json(
+                    { error: "Incorrect password." },
+                    { status: 401 },
                 );
             }
         }

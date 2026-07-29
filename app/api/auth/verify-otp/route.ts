@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyOtpHash } from "@/lib/email";
-import { hashPassword, createToken, setAuthCookie, AuthUser } from "@/lib/auth";
+import {
+    hashPassword,
+    verifyPassword,
+    createToken,
+    setAuthCookie,
+    AuthUser,
+} from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
     try {
@@ -90,6 +96,16 @@ export async function POST(req: NextRequest) {
                 return NextResponse.json(
                     { error: "Account not found. Please sign up first." },
                     { status: 404 },
+                );
+            }
+            const passwordValid = await verifyPassword(
+                password,
+                user.passwordHash,
+            );
+            if (!passwordValid) {
+                return NextResponse.json(
+                    { error: "Incorrect password." },
+                    { status: 401 },
                 );
             }
         }
