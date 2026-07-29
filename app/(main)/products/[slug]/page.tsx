@@ -116,6 +116,10 @@ export default function ProductDetailPage() {
 
     const handleAddToCart = async () => {
         if (!product) return;
+        if (!user) {
+            router.push(`/login?redirect=/products/${slug}`);
+            return;
+        }
         if (isPhoneCase && !selectedCaseBrand) {
             toast.error("Please select a phone brand");
             return;
@@ -143,6 +147,10 @@ export default function ProductDetailPage() {
 
     const handleBuyNow = async () => {
         if (!product) return;
+        if (!user) {
+            router.push(`/login?redirect=/products/${slug}`);
+            return;
+        }
         if (isPhoneCase && !selectedCaseBrand) {
             toast.error("Please select a phone brand");
             return;
@@ -979,7 +987,7 @@ export default function ProductDetailPage() {
                                 Please sign in to write a review
                             </p>
                             <Link
-                                href='/login?redirect=/products/[slug]'
+                                href={`/login?redirect=/products/${slug}`}
                                 className='btn-outline-gold inline-flex px-4 py-2 rounded-lg text-sm'
                             >
                                 Sign In

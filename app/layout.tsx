@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
-    metadataBase: new URL("https://tstechcanopy.com"),
+    metadataBase: new URL("https://tstechnology.in"),
     title: "TS Technology — Strength. Style. Protection.",
     description:
         "Premium tech accessories in Kolkata. Mobile covers, chargers, cables, earphones, laptop accessories, smartwatches, power banks and more.",

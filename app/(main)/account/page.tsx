@@ -14,7 +14,6 @@ import {
     CircleCheck as CheckCircle,
     Truck,
     Circle as XCircle,
-    Gift,
     Coins,
     Heart,
     Smartphone,
@@ -23,11 +22,10 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { ProductCard } from "@/components/ProductCard";
-import { ReferralPanel } from "@/components/ReferralPanel";
 import { LoyaltyPanel } from "@/components/LoyaltyPanel";
 import type { Order, OrderItem, Product } from "@/lib/database.types";
 
-type Tab = "orders" | "wishlist" | "loyalty" | "referrals" | "profile";
+type Tab = "orders" | "wishlist" | "loyalty" | "profile";
 
 const STATUS_CONFIG: Record<
     string,
@@ -74,7 +72,6 @@ const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
     { id: "orders", label: "Orders", icon: Package },
     { id: "wishlist", label: "Wishlist", icon: Heart },
     { id: "loyalty", label: "Loyalty", icon: Coins },
-    { id: "referrals", label: "Refer & Earn", icon: Gift },
     { id: "profile", label: "Profile", icon: User },
 ];
 
@@ -485,9 +482,6 @@ export default function AccountPage() {
 
                 {/* ─── LOYALTY ─── */}
                 {tab === "loyalty" && <LoyaltyPanel />}
-
-                {/* ─── REFERRALS ─── */}
-                {tab === "referrals" && <ReferralPanel />}
 
                 {/* ─── PROFILE ─── */}
                 {tab === "profile" && (

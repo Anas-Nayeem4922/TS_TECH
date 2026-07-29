@@ -135,14 +135,14 @@ export function Navbar() {
                             <div className='relative w-10 h-10 rounded-lg overflow-hidden ring-1 ring-gold-500/30'>
                                 <Image
                                     src={LOGO}
-                                    alt='TS Tech Canopy'
+                                    alt='TS Technology'
                                     fill
                                     className='object-cover'
                                 />
                             </div>
                             <div className='hidden sm:block'>
                                 <div className='text-sm font-700 leading-none shimmer-text'>
-                                    TS TECH CANOPY
+                                    TS TECHNOLOGY
                                 </div>
                                 <div
                                     className={`text-[9px] tracking-widest leading-none mt-0.5 ${theme === "dark" ? "text-silver-500" : "text-gray-500"}`}

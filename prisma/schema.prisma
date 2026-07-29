@@ -22,9 +22,6 @@ model User {
   orders           Order[]
   reviews          Review[]
   wishlists        Wishlist[]
-  referralCode     ReferralCode?
-  referralUses     ReferralUse[]  @relation("referred_user")
-  referralCredits  ReferralCredit[]
   loyaltyMembership LoyaltyMembership?
 }
 
@@ -149,8 +146,6 @@ model Order {
 
   user            User            @relation(fields: [userId], references: [id])
   orderItems      OrderItem[]
-  referralUses    ReferralUse[]
-  referralCredits ReferralCredit[]
 
   @@index([userId])
 }
@@ -193,52 +188,6 @@ model Wishlist {
   @@unique([userId, productId])
 }
 
-model ReferralCode {
-  id                String   @id @default(uuid())
-  userId            String   @unique
-  code              String   @unique
-  rewardPerReferral Float    @default(50)
-  referredReward    Float    @default(25)
-  usesCount         Int      @default(0)
-  isActive          Boolean  @default(true)
-  createdAt         DateTime @default(now())
-
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  referralUses ReferralUse[]
-
-  @@index([code])
-}
-
-model ReferralUse {
-  id              String   @id @default(uuid())
-  referralCodeId  String
-  referredUserId  String   @unique
-  status          String   @default("pending")
-  orderId         String?
-  referrerReward  Float?
-  referredDiscount Float?
-  createdAt       DateTime @default(now())
-
-  referralCode ReferralCode @relation(fields: [referralCodeId], references: [id], onDelete: Cascade)
-  referredUser User         @relation("referred_user", fields: [referredUserId], references: [id], onDelete: Cascade)
-  order        Order?       @relation(fields: [orderId], references: [id])
-}
-
-model ReferralCredit {
-  id          String   @id @default(uuid())
-  userId      String
-  amount      Float
-  description String   @default("Referral reward")
-  isUsed      Boolean  @default(false)
-  orderId     String?
-  createdAt   DateTime @default(now())
-
-  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  order Order? @relation(fields: [orderId], references: [id])
-
-  @@index([userId])
-}
-
 model LoyaltyMembership {
   userId         String   @id
   tier           String   @default("member")
@@ -250,4 +199,16 @@ model LoyaltyMembership {
   lastUpdatedAt  DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model OtpCode {
+  id        String   @id @default(uuid())
+  email     String
+  code      String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([expiresAt])
 }

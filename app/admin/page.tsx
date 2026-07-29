@@ -127,7 +127,7 @@ export default function AdminDashboardPage() {
     const [dailyDealsProducts, setDailyDealsProducts] = useState<Product[]>([]);
     const [allProducts, setAllProducts] = useState<Product[]>([]);
     const [showDealManager, setShowDealManager] = useState(false);
-    const [dealsExpanded, setDealsExpanded] = useState(true);
+    const [dealsExpanded, setDealsExpanded] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState<{
         orderNumber: string;
         total: number;
@@ -275,7 +275,7 @@ export default function AdminDashboardPage() {
                 <div>
                     <h1 className='text-2xl font-bold text-white'>Dashboard</h1>
                     <p className='text-silver-500 text-sm'>
-                        Welcome back to TS Tech Canopy admin.
+                        Welcome back to TS Technology admin.
                     </p>
                 </div>
                 <Link
